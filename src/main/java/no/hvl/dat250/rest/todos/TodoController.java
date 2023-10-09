@@ -14,9 +14,10 @@ import java.util.UUID;
  * Rest-Endpoint for todos.
  */
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 public class TodoController{
   List<Todo> todos = new ArrayList<>();
-  Random random = new Random();
+  Long count = 0L;
 
     @ExceptionHandler
     public ResponseEntity<String> handle(IOException ex) {
@@ -25,7 +26,8 @@ public class TodoController{
 
   @PostMapping("/todos")
   public Todo createTodo(@RequestBody Todo todo){
-    todo.setId(random.nextLong());
+        this.count += 1L;
+    todo.setId(count);
     todos.add(todo);
     return todo;
   }
@@ -53,9 +55,9 @@ public class TodoController{
   }
 
   @DeleteMapping("/todos/{id}")
-  public ResponseEntity deleteTodo(@PathVariable long id){
-        if (todos.removeIf(todo -> todo.getId() == id)){
-            return ResponseEntity.ok("Ok");
+  public ResponseEntity deleteTodo(@PathVariable String id){
+        if (todos.removeIf(todo -> todo.getId() == Long.parseLong(id))){
+            return ResponseEntity.noContent().build();
         } else {
             String msg = String.format(TODO_WITH_THE_ID_X_NOT_FOUND, id);
             return ResponseEntity.ok(msg);
